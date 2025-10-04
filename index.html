@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -7,9 +6,6 @@
 <title>โรงงานนักประดิษฐ์ – วัตถุและวัสดุ</title>
 
 <style>
-/* =========================
-   ฟอนต์/ธีมพื้นฐาน
-   ========================= */
 @font-face{
   font-family: 'MyGameFont';
   src: url('image/THSarabunNew.woff2') format('woff2'),
@@ -111,8 +107,6 @@ letter-spacing:.5px
   width:100%;
 }
 
-
-/* ย้ายปุ่ม HUD ไปมุมซ้าย/ขวาแน่นอน */
 .hud { position: initial !important; inset:auto !important; }
 .hud .left, .hud .right{
   position:fixed !important; top:var(--hud-top) !important; z-index:50000; pointer-events:none;
@@ -245,7 +239,6 @@ letter-spacing:.5px
 .option-wrap.faded .opt-cap{ animation: capFadeUp 560ms ease forwards; }
 .option-wrap.chosen .opt-cap{ animation: capFadeUp 620ms ease forwards; }
 
-/* กล่องคำถามด้านล่าง: สไลด์แนวนอนเข้ามา */
 /* กล่องคำถามด้านล่าง: วิ่งแนวนอนจากขวา -> ซ้าย */
 #questionBox{
   position:fixed;
@@ -289,7 +282,6 @@ letter-spacing:.5px
 /* เร่งข้อความคำถามให้ออกซ้ายพร้อมจาง (เรียกตอนผู้เล่นกดเลือก) */
 @keyframes qBoostOut{ to{ transform:translateX(-120%); opacity:0 } }
 
-/* (ล้างคลาสเก่า ถ้ายังมีติดอยู่จากรอบก่อน) */
 /* === ตราประดับใต้คำถาม === */
 :root{
   --decor-w: 104vw; /* ปรับความกว้าง */
@@ -311,13 +303,10 @@ letter-spacing:.5px
   filter: drop-shadow(0 6px 18px rgba(0,0,0,.35));
 }
 
-/* ปิดการคลิก qDecor แต่คงเรืองแสงได้ */
-#qDecor{
-  pointer-events: none; /* ไม่รับคลิก แต่ยังแสดงและเรืองแสงได้ */
+   #qDecor{
+  pointer-events: none; 
 }
 
-
-/* สถานะเชิญชวนให้กดเพื่อไปต่อ */
 #qDecor.arm-next{
   animation: none !important;
   filter: drop-shadow(0 0 18px rgba(255, 220, 0, .75));
@@ -445,6 +434,26 @@ body::before{ content:""; position:fixed; top:0; right:0; width:200px; height:20
 }
 #flashOverlay.on{ opacity: 1; }
 
+/* =========================
+   พื้นหลังซ้อนหลัง Banner2
+   ========================= */
+#bgLayer {
+  position: fixed;
+  inset: 0;
+  background: url("image/background2.png") center/cover no-repeat;
+  z-index: 1000; /* อยู่เหนือพื้นหลังเกม */
+}
+
+#banner2,
+#enterBtn {
+  position: relative;
+  z-index: 2000; /* อยู่เหนือ background2 */
+}
+/* ให้ bgLayer โผล่เฉพาะตอนยังไม่เข้าเกมเท่านั้น */
+body.in-game #bgLayer {
+  display: none !important;
+}
+
 
 /* ======= พรีโหลด ======= */
 #preloadOverlay{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:#000c; color:#fff; z-index:99999; flex-direction:column; gap:12px; font-weight:900 }
@@ -461,7 +470,6 @@ body::before{ content:""; position:fixed; top:0; right:0; width:200px; height:20
   <div id="questionBox" aria-live="polite"></div>
     <img id="qDecor" src="objects2/object0.png" alt="ตกแต่งใต้คำถาม">
   <img id="qImg" alt="ภาพประกอบ" />
-  <!-- ปุ่มลัดสี่เหลี่ยม: ไปข้อถัดไป -->
   <div id="fastNext" role="button" aria-label="ไปข้อถัดไป">NEXT</div>
 </div>
 
@@ -481,6 +489,8 @@ body::before{ content:""; position:fixed; top:0; right:0; width:200px; height:20
     <button class="levelBtn" id="guideBtn">กติกาการเล่น 📖</button>
   </div>
 </div>
+
+<div id="bgLayer"></div>
 
 <!-- ===== Start / Countdown ===== -->
 <div id="startScreen">
@@ -543,8 +553,6 @@ body::before{ content:""; position:fixed; top:0; right:0; width:200px; height:20
 <audio id="wrongSound" preload="auto" src="image/wrong.mp3"></audio>
 <audio id="beltSound" preload="auto" src="image/belt.mp3"></audio>
 
-
-
 <!-- ===== ปุ่ม Mute / Fullscreen ===== -->
 <button id="muteBtn" aria-pressed="false" title="Mute / Unmute">🔊</button>
 <button id="fsBtn" aria-pressed="false" title="เข้าสู่โหมดเต็มจอ">⛶</button>
@@ -596,14 +604,13 @@ body::before{ content:""; position:fixed; top:0; right:0; width:200px; height:20
 // สถานะ/ตัวแปรหลัก
 // =========================
 window.__ALL_IMAGES_READY__ = false;
-window.currentLevel = 1; // 1: ถามวัสดุ → เลือกวัตถุ, 2: ถามวัตถุ → เลือกวัสดุ
+window.currentLevel = 1; 
 
 const GAME_DURATION_MS = 120000; // 2 นาที
 let gameTimerId = null, gameEndAt = 0, remainingMs = GAME_DURATION_MS;
 let running=false, ended=true, paused=false;
-let awaitingContinue=false; // พร้อมรอการกด object0 เพื่อปล่อยโจทย์ถัดไป
+let awaitingContinue=false; 
 let score=0, round=0, awaitingAnswer=false;
-// สำหรับด่าน 3 (หลายคำตอบ)
 let remainingCorrect = new Set();
 let __multiCorrectSet = new Set();
 
@@ -638,7 +645,6 @@ function positionDecorUnderQuestion(){
   // ใช้ left เป็นพิกัดจริง (ไม่ใช้ transform อีก เพื่อให้ควบคุมแม่นยำ)
   qDecor.style.transform = 'translateX(0)';
   qDecor.style.left = Math.round(centerX - (qDecor.offsetWidth/2)) + 'px';
-  // bottom ใช้จากตัวแปร CSS อยู่แล้ว
 }
 
 function syncFastNextUI(){
@@ -663,7 +669,6 @@ const pauseBtn = document.getElementById('pauseBtn');
 const goldWrap = document.getElementById('goldWrap');
 const clockEl = document.getElementById('clock');
 
-// ===== ตั้งข้อความคำถามแบบวิ่งแนวนอน =====
 // ===== ตั้งข้อความคำถามแบบวิ่งแนวนอน =====
 function setQuestionMarquee(text){
   qBox.textContent = '';
@@ -694,9 +699,7 @@ span.addEventListener('animationend', () => {
 
   if (!ended) {
     awaitingAnswer = false;
-    // ฆ่าตัววิ่งให้ขาด ไม่ให้มีโอกาสเด้งกลับ
     stopMarquee();
-    // เล่นเอฟเฟกต์ย่อเล็กลงแล้วหายกับ “ทุกช้อยส์”
     vanishAllChoices(1200); // ← ปรับความเร็วได้ เช่น 360 / 520 ms
     qBox.textContent = ''; // กันเหลือเศษข้อความ
     awaitingContinue = true;
@@ -1131,7 +1134,7 @@ const LEVEL3_BANK = [
       { type:'material', name:'กระดาษ',   caption:'กระดาษ',   img: MATERIAL_IMG['กระดาษ']   },
       { type:'material', name:'พลาสติก',   caption:'พลาสติก',   img: MATERIAL_IMG['พลาสติก']   },
     ],
-    correctIndices: [0, 1, 2] // โลหะ และ ไม้ ถูก
+    correctIndices: [0, 1, 2] 
   },
 
   {
@@ -1147,7 +1150,7 @@ const LEVEL3_BANK = [
       { type:'material', name:'กระดาษ',   caption:'กระดาษ',   img: MATERIAL_IMG['กระดาษ']   },
       { type:'material', name:'พลาสติก',   caption:'พลาสติก',   img: MATERIAL_IMG['พลาสติก']   },
     ],
-    correctIndices: [0, 1, 2] // โลหะ และ ไม้ ถูก
+    correctIndices: [0, 1, 2] 
   },
 
   {
@@ -1163,7 +1166,7 @@ const LEVEL3_BANK = [
       { type:'material', name:'กระดาษ',   caption:'กระดาษ',   img: MATERIAL_IMG['กระดาษ']   },
       { type:'material', name:'พลาสติก',   caption:'พลาสติก',   img: MATERIAL_IMG['พลาสติก']   },
     ],
-    correctIndices: [4] // ยาง และ พลาสติก ถูก
+    correctIndices: [4] 
   },
 
   {
@@ -1179,7 +1182,7 @@ const LEVEL3_BANK = [
       { type:'material', name:'กระดาษ',   caption:'กระดาษ',   img: MATERIAL_IMG['กระดาษ']   },
       { type:'material', name:'พลาสติก',   caption:'พลาสติก',   img: MATERIAL_IMG['พลาสติก']   },
     ],
-    correctIndices: [6, 7, 8] // ยาง และ พลาสติก ถูก
+    correctIndices: [6, 7, 8] 
   },
 
   {
@@ -1195,7 +1198,7 @@ const LEVEL3_BANK = [
       { type:'material', name:'กระดาษ',   caption:'กระดาษ',   img: MATERIAL_IMG['กระดาษ']   },
       { type:'material', name:'พลาสติก',   caption:'พลาสติก',   img: MATERIAL_IMG['พลาสติก']   },
     ],
-    correctIndices: [1, 2, 3, 4, 5, 6, 7, 8] // ยาง และ พลาสติก ถูก
+    correctIndices: [1, 2, 3, 4, 5, 6, 7, 8] 
   },
 
   {
@@ -1438,12 +1441,10 @@ function drawLevel3(){
   }));
   const maxIndex = allChoices.length - 1;
 
-  // ทำความสะอาด index คำตอบถูกที่มากับโจทย์
   let correctGlobal = Array.isArray(q.correctIndices)
     ? [...new Set(q.correctIndices.filter(i => Number.isInteger(i) && i >= 0 && i <= maxIndex))]
     : [];
 
-  // บังคับให้มีคำตอบถูกอย่างน้อย 1 ตัว
   if (correctGlobal.length === 0) {
     correctGlobal = [Math.floor(Math.random() * allChoices.length)];
   }
@@ -1467,7 +1468,6 @@ function drawLevel3(){
   }
   shuffle(allIncorrect).slice(0, slotsLeft).forEach(i => selected.add(i));
 
-  // สุ่มลำดับปุ่ม แล้วแม็ปกลับเป็น answers / correctIndices ใหม่
   const idxs = shuffle([...selected]);
   const answers = idxs.map(i => allChoices[i]);
   const correctIndices = idxs
@@ -1482,8 +1482,6 @@ function drawLevel3(){
 }
 
 
-
-// ด่าน 1: วัสดุ -> เลือกวัตถุ (คำตอบถูกมาจาก LEVEL1_BINDINGS, ตัวหลอกจาก OBJECTS)
 function drawLevel1(){
   const keys = Object.keys(LEVEL1_BINDINGS);
   const material = pick(keys);
@@ -1520,8 +1518,6 @@ function drawLevel2(){
   const obj = pick(OBJECTS);
   const question = obj.name;            // โจทย์ = ชื่อวัตถุ
   const correctMat = obj.material;
-
-  // รูป/แคปชัน "ถูกต้อง" จากแมปปิง (ถ้าไม่ระบุในแมป ให้ fallback เป็นรูปวัสดุ + caption=ชื่อวัสดุ)
   let correct = LEVEL2_BINDINGS[question];
   if(!correct){
     correct = { img: MATERIAL_IMG[correctMat], caption: correctMat };
@@ -1581,7 +1577,6 @@ function collectAllGameImages(){
   Object.values(LEVEL1_BINDINGS).forEach(arr =>
       arr.forEach(item => urls.push(item.img))
   );
-  // เพิ่มภาพพื้นหลัง/แบนเนอร์อื่น ๆ แบบระบุครบ ห้ามใช้ …
   urls.push(
     "image/background2.png",
     "image/banner2.png",
@@ -1618,7 +1613,7 @@ function clearChoices(){
 // ==== STOP marquee safely (ฆ่าแอนิเมชัน + กัน callback เก่า) ====
 let __mqToken = 0;
 function stopMarquee(){
-  __mqToken++; // ทำให้ callback เก่ากลายเป็นโมฆะ
+  __mqToken++; 
   const span = qBox.querySelector('.mq');
   if (!span) return;
   span.style.animation = 'none';
@@ -1644,12 +1639,10 @@ function vanishAllChoices(ms = 420){
     }
   });
 
-  // ใส่อนิเมชัน “ย่อแล้วหาย” ให้ทั้งกล่อง
   requestAnimationFrame(()=>{
     wraps.forEach(w=> w.classList.add('is-vanish'));
   });
 
-  // เคลียร์จริงหลังอนิเมชันจบ
   setTimeout(()=>{ clearChoices(); }, ms);
 }
 
@@ -1667,7 +1660,6 @@ function spawnRow3(answers, correctIndex, questionText){
   clearChoices();
 
   answers.forEach((ans,idx)=>{
-    // กล่องครอบ: เพื่อวาง "วงกลม" + "แคปชันใต้รูป"
     const wrap = document.createElement('div');
     wrap.className = 'option-wrap';
 
@@ -1797,8 +1789,6 @@ function tryAnswer(el){
 
   // เอฟเฟกต์เลือก
   el.classList.remove('go-in'); el.classList.add('pick-pop');
-  // ที่เหลือเลื่อนขึ้น
-  // ที่เหลือเลื่อนขึ้น (เลือกเฉพาะ .option.circle)
 [...choicesRow.querySelectorAll('.option.circle')].forEach(n=>{
   if(n!==el){
     n.classList.remove('go-in');
@@ -1856,7 +1846,6 @@ function tryAnswer(el){
 setTimeout(()=>{
   choicesRow.style.pointerEvents = '';
   clearChoices();                  // ← ล้างวงกลมคำตอบที่เฟดออกแล้ว
-  // ข้อความล่างเราบูสต์ออกไปแล้วใน boostQuestionOutFast(); ถ้ายังเหลือให้เคลียร์ซ้ำ
   qBox.textContent = '';           // ← กันเด้งมุมซ้ายล่าง
 
   awaitingContinue = true;
@@ -1982,7 +1971,6 @@ document.getElementById('questionBox')?.querySelector('.mq')?.style.setProperty(
 
 restartBtn.addEventListener('click', ()=>{ overlay.style.visibility='hidden'; overlay.style.opacity='0'; resetState(); startGame(); bgm.currentTime=0; bgm.play().catch(()=>{}); });
 selectLevelBtn.addEventListener('click', ()=>{
-// ถ้ากำลังอยู่หน้าเริ่ม/นับถอยหลัง ให้ปิดและหยุดนับทันที
 if (window.__countdownItv) {
   clearInterval(window.__countdownItv);
   window.__countdownItv = null;
@@ -2042,7 +2030,6 @@ st.textContent =
       ? 'ภารกิจ: เลือกวัสดุให้สอดคล้องกับวัตถุบนสายพาน'
       : 'ภารกิจ: เลือกวัสดุที่มีคุณสมบัติตามที่กำหนด';
 
-
       // ปุ่มเริ่ม / นับถอยหลัง
       startBtn.style.display='inline-block'; startBtn.disabled=false; startBtn.style.pointerEvents='auto';
       countdownEl.style.display='none'; countdownEl.textContent='3';
@@ -2053,7 +2040,7 @@ st.textContent =
   document.getElementById('guideBack')?.addEventListener('click', ()=>{ guideScreen.style.display='none'; landing.classList.remove('hide') });
 
 // เริ่มเกม + นับถอยหลัง 3..2..1
-let countdownItv=null; // ← ของเดิมมีอยู่ ให้ลบหรือคอมเมนต์ทิ้งไป
+let countdownItv=null; 
 
 // === ใส่ของใหม่แทน ===
 window.__countdownItv = null;
