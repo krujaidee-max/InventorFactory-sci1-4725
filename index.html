@@ -60,6 +60,7 @@ body{
   pointer-events:none; z-index:40000;
 }
 body:not(.in-game):not(.prestart) .hud { display:none !important; }
+body:not(.in-game):not(.prestart) #clock { display: none !important; }
 
 #clock.clock-pill{
   position:fixed; top:14px; left:50%; transform:translateX(-50%);
@@ -2174,3 +2175,4 @@ document.addEventListener('visibilitychange', ()=>{ if(document.hidden && stream
 <div id="flashOverlay" aria-hidden="true"></div>
 </body>
 </html>
+
